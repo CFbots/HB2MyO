@@ -21,6 +21,61 @@ body {
   overflow-x: hidden;
 }
 
+body.intro-active {
+  overflow: hidden;
+}
+
+body.intro-active #mainPage {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.intro-done #mainPage {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 500ms ease;
+}
+
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 30% 20%, #ffe9d6 0%, #fff8ef 45%, #fff4e8 100%);
+  z-index: 50;
+}
+
+.intro-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: min(88vw, 520px);
+}
+
+.intro-text {
+  margin: 0;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(2.4rem, 9vw, 5.5rem);
+  letter-spacing: 0.03em;
+  color: #c2410c;
+  text-align: center;
+  animation: intro-pop 650ms ease both;
+}
+
+.intro-photo {
+  width: min(88vw, 360px);
+  max-height: 45vh;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+  animation: intro-pop 650ms ease both;
+}
+
+.intro-overlay.fade-out {
+  animation: intro-fade 2000ms ease forwards;
+}
+
 .bg-shape {
   position: fixed;
   border-radius: 999px;
@@ -104,7 +159,20 @@ h1 span {
   margin-top: 2rem;
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(280px, 640px);
+  justify-content: center;
+}
+
+.wish-gif-wrap {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.wish-gif {
+  width: min(86vw, 280px);
+  height: auto;
+  display: block;
 }
 
 .card {
@@ -163,6 +231,31 @@ h1 span {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes intro-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes intro-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
   }
 }
 

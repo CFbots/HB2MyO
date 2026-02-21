@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Happy Birthday!</title>
+    <link rel="icon" type="image/jpeg" href="src/icon.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -12,37 +13,36 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="intro-active">
+    <div id="introOverlay" class="intro-overlay" aria-hidden="true">
+      <div class="intro-content">
+        <p class="intro-text">Happy Birthday My Love</p>
+        <img class="intro-photo" src="src/HB.jpg" alt="Birthday photo" />
+      </div>
+    </div>
     <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
     <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
 
-    <main class="page">
+    <main id="mainPage" class="page">
       <section class="hero">
-        <p class="eyebrow">A Birthday Mini-Site</p>
-        <h1>Happy Birthday, <span id="name">My Love</span></h1>
+        <h1>Happy Birthday, <span id="name">Oliver</span></h1>
         <p class="subtitle">
-          Today is all about you. Thank you for being my favorite person, my safe place, and my best adventure.
+          Today is all about you. Thank you for being my favorite person, my safe place, and my best adventure. :D
         </p>
-        <button id="celebrateBtn" class="celebrate-btn">Tap to celebrate</button>
+        <button id="celebrateBtn" class="celebrate-btn">Surprise</button>
       </section>
 
       <section class="cards">
         <article class="card">
-          <h2>3 things I love about you</h2>
-          <ul>
-            <li>Your smile that fixes every bad day</li>
-            <li>Your kindness in the little moments</li>
-            <li>The way life is better with you in it</li>
-          </ul>
-        </article>
-
-        <article class="card">
-          <h2>Birthday wish</h2>
           <p>
             I hope this year brings you bold dreams, peaceful mornings, and so many reasons to laugh.
+            And I hope I get to celebrate every win beside you.
           </p>
-          <p>And I hope I get to celebrate every win beside you.</p>
         </article>
+      </section>
+
+      <section class="wish-gif-wrap" aria-label="Birthday gif">
+        <img class="wish-gif" src="src/rollingpiggy.gif" alt="Rolling pig birthday gif" />
       </section>
     </main>
 

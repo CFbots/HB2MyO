@@ -1,4 +1,5 @@
 const celebrateBtn = document.getElementById("celebrateBtn");
+const introOverlay = document.getElementById("introOverlay");
 
 function launchConfetti(count = 42) {
   const colors = ["#e76f51", "#f4a261", "#2a9d8f", "#264653", "#e9c46a"];
@@ -19,8 +20,25 @@ function launchConfetti(count = 42) {
 
 celebrateBtn.addEventListener("click", () => {
   launchConfetti();
-  celebrateBtn.textContent = "Celebrating you";
+  celebrateBtn.textContent = "Celebrating";
   setTimeout(() => {
-    celebrateBtn.textContent = "Tap to celebrate";
+    celebrateBtn.textContent = "Surprise";
   }, 1500);
 });
+
+if (introOverlay) {
+  const popDurationMs = 2500;
+  const fadeDurationMs = 2000;
+
+  window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+      introOverlay.classList.add("fade-out");
+
+      setTimeout(() => {
+        introOverlay.remove();
+        document.body.classList.remove("intro-active");
+        document.body.classList.add("intro-done");
+      }, fadeDurationMs);
+    }, popDurationMs);
+  });
+}
