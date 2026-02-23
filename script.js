@@ -18,13 +18,17 @@ function launchConfetti(count = 42) {
   }
 }
 
-celebrateBtn.addEventListener("click", () => {
-  launchConfetti();
-  celebrateBtn.textContent = "Celebrating";
-  setTimeout(() => {
-    celebrateBtn.textContent = "Surprise";
-  }, 1500);
-});
+window.launchConfetti = launchConfetti;
+
+if (celebrateBtn) {
+  celebrateBtn.addEventListener("click", () => {
+    launchConfetti();
+    celebrateBtn.textContent = "Celebrating";
+    setTimeout(() => {
+      celebrateBtn.textContent = "Surprise";
+    }, 1500);
+  });
+}
 
 if (introOverlay) {
   const popDurationMs = 2500;
