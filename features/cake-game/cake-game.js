@@ -17,13 +17,12 @@
   const toStep3Btn = document.getElementById("toStep3Btn");
   const backToStep2Btn = document.getElementById("backToStep2Btn");
   const lightCandleBtn = document.getElementById("lightCandleBtn");
+  const takePictureBtn = document.getElementById("takePictureBtn");
 
   const flavorOptions = [...document.querySelectorAll(".flavor-option")];
   const decorateGrid = step2Panel?.querySelector(".decorate-grid");
 
   const cakePreview = document.getElementById("cakePreview");
-  const drizzle = document.querySelector(".drizzle");
-  const cherry = document.querySelector(".cherry");
   const flame = document.getElementById("flame");
   const wishText = document.getElementById("wishText");
 
@@ -37,9 +36,8 @@
     !toStep3Btn ||
     !backToStep2Btn ||
     !lightCandleBtn ||
+    !takePictureBtn ||
     !cakePreview ||
-    !drizzle ||
-    !cherry ||
     !flame ||
     !wishText ||
     !decorateGrid
@@ -47,29 +45,17 @@
     return;
   }
 
-  const candle = cakePreview.querySelector(".candle");
-  let cookies = cakePreview.querySelector(".cookies");
-  if (!cookies) {
-    cookies = document.createElement("div");
-    cookies.className = "cookies hidden";
-    cookies.setAttribute("aria-hidden", "true");
-    if (candle) {
-      cakePreview.insertBefore(cookies, candle);
-    } else {
-      cakePreview.appendChild(cookies);
-    }
-  }
-
   const decorations = [
-    { id: "cherry", emoji: "\u{1F352}", target: cherry },
-    { id: "choco", emoji: "\u{1F36B}", target: drizzle },
-    { id: "cookies", emoji: "\u{1F36A}", target: cookies },
-    // Extendable: add more items with { id, emoji, target }.
+    { id: "cherry", emoji: "\u{1F352}" },
+    { id: "choco", emoji: "\u{1F36B}" },
+    { id: "cookies", emoji: "\u{1F36A}" },
+    // Extendable: add more items with { id, emoji }.
   ];
 
   let gameStep = 1;
   let selectedFlavor = "vanilla";
-  const selectedDecorations = new Set(["cherry"]);
+  const stickerElementsByDeco = new Map(decorations.map((deco) => [deco.id, []]));
+  let dragLayer = 10;
 
   const decoScrollMenu = document.createElement("div");
   decoScrollMenu.className = "deco-scroll-menu";
@@ -86,10 +72,10 @@
     btn.setAttribute("aria-label", deco.id);
     btn.title = deco.id;
     btn.addEventListener("click", () => {
-      if (selectedDecorations.has(deco.id)) {
-        selectedDecorations.delete(deco.id);
-      } else {
-        selectedDecorations.add(deco.id);
+      const stickers = stickerElementsByDeco.get(deco.id);
+      if (stickers) {
+        const sticker = createSticker(deco, stickers.length);
+        stickers.push(sticker);
       }
       renderDecorations();
     });
@@ -101,6 +87,40 @@
   function triggerConfetti(count = 42) {
     if (typeof window.launchConfetti === "function") {
       window.launchConfetti(count);
+    }
+  }
+
+  async function downloadCakeSnapshot() {
+    if (typeof window.html2canvas !== "function") {
+      takePictureBtn.textContent = "Snapshot unavailable";
+      setTimeout(() => {
+        takePictureBtn.textContent = "Take a Picture";
+      }, 1200);
+      return;
+    }
+
+    const previousLabel = takePictureBtn.textContent;
+    takePictureBtn.disabled = true;
+    takePictureBtn.textContent = "Taking...";
+
+    try {
+      const canvas = await window.html2canvas(cakePreview, {
+        backgroundColor: null,
+        scale: 2,
+      });
+
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const link = document.createElement("a");
+      link.download = `cake-snapshot-${stamp}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (error) {
+      takePictureBtn.textContent = "Try again";
+    } finally {
+      setTimeout(() => {
+        takePictureBtn.disabled = false;
+        takePictureBtn.textContent = previousLabel;
+      }, 600);
     }
   }
 
@@ -118,12 +138,100 @@
     cakePreview.classList.add(`flavor-${selectedFlavor}`);
   }
 
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function placeStickerWithinBounds(sticker, left, top) {
+    const maxLeft = Math.max(0, cakePreview.clientWidth - sticker.offsetWidth);
+    const maxTop = Math.max(0, cakePreview.clientHeight - sticker.offsetHeight);
+    const x = clamp(left, 0, maxLeft);
+    const y = clamp(top, 0, maxTop);
+    sticker.style.left = `${x}px`;
+    sticker.style.top = `${y}px`;
+  }
+
+  function makeStickerDraggable(sticker) {
+    let dragState = null;
+
+    sticker.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse" && event.button !== 0) {
+        return;
+      }
+
+      const currentLeft = Number.parseFloat(sticker.style.left || "0");
+      const currentTop = Number.parseFloat(sticker.style.top || "0");
+
+      dragState = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        startLeft: currentLeft,
+        startTop: currentTop,
+      };
+
+      dragLayer += 1;
+      sticker.style.zIndex = String(dragLayer);
+      sticker.classList.add("dragging");
+      sticker.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+
+    sticker.addEventListener("pointermove", (event) => {
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+
+      const deltaX = event.clientX - dragState.startX;
+      const deltaY = event.clientY - dragState.startY;
+      placeStickerWithinBounds(sticker, dragState.startLeft + deltaX, dragState.startTop + deltaY);
+    });
+
+    function endDrag(event) {
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+      sticker.classList.remove("dragging");
+      dragState = null;
+    }
+
+    sticker.addEventListener("pointerup", endDrag);
+    sticker.addEventListener("pointercancel", endDrag);
+  }
+
+  function createSticker(deco, index) {
+    const sticker = document.createElement("button");
+    sticker.type = "button";
+    sticker.className = "deco-sticker";
+    sticker.dataset.deco = deco.id;
+    sticker.textContent = deco.emoji;
+    sticker.setAttribute("aria-label", `${deco.id} sticker`);
+    sticker.title = deco.id;
+    cakePreview.appendChild(sticker);
+
+    const left = 52 + index * 42;
+    const top = 124 + (index % 2) * 24;
+    placeStickerWithinBounds(sticker, left, top);
+    makeStickerDraggable(sticker);
+
+    sticker.addEventListener("dblclick", () => {
+      sticker.remove();
+      const stickers = stickerElementsByDeco.get(deco.id);
+      if (stickers) {
+        const next = stickers.filter((item) => item !== sticker);
+        stickerElementsByDeco.set(deco.id, next);
+      }
+      renderDecorations();
+    });
+
+    return sticker;
+  }
+
   function renderDecorations() {
     decorations.forEach((deco) => {
-      deco.target.classList.toggle("hidden", !selectedDecorations.has(deco.id));
       const btn = decoButtons.get(deco.id);
       if (btn) {
-        const isActive = selectedDecorations.has(deco.id);
+        const isActive = (stickerElementsByDeco.get(deco.id)?.length ?? 0) > 0;
         btn.classList.toggle("active", isActive);
         btn.setAttribute("aria-pressed", String(isActive));
       }
@@ -136,8 +244,10 @@
       opt.classList.toggle("active", opt.dataset.flavor === "vanilla");
     });
 
-    selectedDecorations.clear();
-    selectedDecorations.add("cherry");
+    stickerElementsByDeco.forEach((stickers) => {
+      stickers.forEach((sticker) => sticker.remove());
+      stickers.length = 0;
+    });
 
     flame.classList.add("hidden");
     wishText.classList.add("hidden");
@@ -192,6 +302,8 @@
     lightCandleBtn.textContent = "Candle lit";
     triggerConfetti(64);
   });
+
+  takePictureBtn.addEventListener("click", downloadCakeSnapshot);
 
   renderFlavor();
   renderDecorations();

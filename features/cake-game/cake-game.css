@@ -119,6 +119,25 @@
   box-shadow: 0 10px 24px rgba(236, 72, 153, 0.18);
 }
 
+.deco-sticker {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: transparent;
+  font-size: 1.9rem;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  padding: 0;
+}
+
+.deco-sticker.dragging {
+  cursor: grabbing;
+  transform: scale(1.08);
+}
+
 .step-actions {
   display: flex;
   gap: 0.65rem;
@@ -258,7 +277,15 @@
   transform: translateX(-50%);
   width: 10px;
   height: 42px;
-  background: repeating-linear-gradient(180deg, #fde68a 0, #fde68a 7px, #f59e0b 7px, #f59e0b 14px);
+  background: linear-gradient(
+    180deg,
+    #fde68a 0 7px,
+    #f59e0b 7px 14px,
+    #fde68a 14px 21px,
+    #f59e0b 21px 28px,
+    #fde68a 28px 35px,
+    #f59e0b 35px 42px
+  );
   border-radius: 999px;
 }
 
