@@ -167,7 +167,7 @@ h1 span {
 }
 
 .wish-gif-wrap {
-  margin-top: 1rem;
+  margin-top: 0;
   display: flex;
   justify-content: center;
 }
@@ -176,6 +176,10 @@ h1 span {
   width: min(86vw, 280px);
   height: auto;
   display: block;
+}
+
+.cake {
+  margin-top: 1.5rem;
 }
 
 .card {

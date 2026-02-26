@@ -19,10 +19,9 @@
   const lightCandleBtn = document.getElementById("lightCandleBtn");
 
   const flavorOptions = [...document.querySelectorAll(".flavor-option")];
-  const decoToggles = [...document.querySelectorAll(".deco-toggle")];
+  const decorateGrid = step2Panel?.querySelector(".decorate-grid");
 
   const cakePreview = document.getElementById("cakePreview");
-  const sprinkles = document.querySelector(".sprinkles");
   const drizzle = document.querySelector(".drizzle");
   const cherry = document.querySelector(".cherry");
   const flame = document.getElementById("flame");
@@ -39,17 +38,65 @@
     !backToStep2Btn ||
     !lightCandleBtn ||
     !cakePreview ||
-    !sprinkles ||
     !drizzle ||
     !cherry ||
     !flame ||
-    !wishText
+    !wishText ||
+    !decorateGrid
   ) {
     return;
   }
 
+  const candle = cakePreview.querySelector(".candle");
+  let cookies = cakePreview.querySelector(".cookies");
+  if (!cookies) {
+    cookies = document.createElement("div");
+    cookies.className = "cookies hidden";
+    cookies.setAttribute("aria-hidden", "true");
+    if (candle) {
+      cakePreview.insertBefore(cookies, candle);
+    } else {
+      cakePreview.appendChild(cookies);
+    }
+  }
+
+  const decorations = [
+    { id: "cherry", emoji: "\u{1F352}", target: cherry },
+    { id: "choco", emoji: "\u{1F36B}", target: drizzle },
+    { id: "cookies", emoji: "\u{1F36A}", target: cookies },
+    // Extendable: add more items with { id, emoji, target }.
+  ];
+
   let gameStep = 1;
   let selectedFlavor = "vanilla";
+  const selectedDecorations = new Set(["cherry"]);
+
+  const decoScrollMenu = document.createElement("div");
+  decoScrollMenu.className = "deco-scroll-menu";
+  decoScrollMenu.setAttribute("role", "group");
+  decoScrollMenu.setAttribute("aria-label", "Decoration options");
+
+  const decoButtons = new Map();
+  decorations.forEach((deco) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "deco-emoji-btn";
+    btn.dataset.deco = deco.id;
+    btn.textContent = deco.emoji;
+    btn.setAttribute("aria-label", deco.id);
+    btn.title = deco.id;
+    btn.addEventListener("click", () => {
+      if (selectedDecorations.has(deco.id)) {
+        selectedDecorations.delete(deco.id);
+      } else {
+        selectedDecorations.add(deco.id);
+      }
+      renderDecorations();
+    });
+    decoButtons.set(deco.id, btn);
+    decoScrollMenu.appendChild(btn);
+  });
+  decorateGrid.replaceChildren(decoScrollMenu);
 
   function triggerConfetti(count = 42) {
     if (typeof window.launchConfetti === "function") {
@@ -67,20 +114,20 @@
   }
 
   function renderFlavor() {
-    cakePreview.classList.remove("flavor-vanilla", "flavor-chocolate", "flavor-strawberry");
+    cakePreview.classList.remove("flavor-vanilla", "flavor-chocolate", "flavor-strawberry", "flavor-earlgrey");
     cakePreview.classList.add(`flavor-${selectedFlavor}`);
   }
 
   function renderDecorations() {
-    const enabled = {
-      sprinkles: decoToggles.find((item) => item.dataset.deco === "sprinkles")?.checked,
-      cherry: decoToggles.find((item) => item.dataset.deco === "cherry")?.checked,
-      drizzle: decoToggles.find((item) => item.dataset.deco === "drizzle")?.checked,
-    };
-
-    sprinkles.classList.toggle("hidden", !enabled.sprinkles);
-    cherry.classList.toggle("hidden", !enabled.cherry);
-    drizzle.classList.toggle("hidden", !enabled.drizzle);
+    decorations.forEach((deco) => {
+      deco.target.classList.toggle("hidden", !selectedDecorations.has(deco.id));
+      const btn = decoButtons.get(deco.id);
+      if (btn) {
+        const isActive = selectedDecorations.has(deco.id);
+        btn.classList.toggle("active", isActive);
+        btn.setAttribute("aria-pressed", String(isActive));
+      }
+    });
   }
 
   function resetGame() {
@@ -89,9 +136,8 @@
       opt.classList.toggle("active", opt.dataset.flavor === "vanilla");
     });
 
-    decoToggles.forEach((item) => {
-      item.checked = item.dataset.deco === "sprinkles";
-    });
+    selectedDecorations.clear();
+    selectedDecorations.add("cherry");
 
     flame.classList.add("hidden");
     wishText.classList.add("hidden");
@@ -138,10 +184,6 @@
       flavorOptions.forEach((opt) => opt.classList.toggle("active", opt === btn));
       renderFlavor();
     });
-  });
-
-  decoToggles.forEach((item) => {
-    item.addEventListener("change", renderDecorations);
   });
 
   lightCandleBtn.addEventListener("click", () => {

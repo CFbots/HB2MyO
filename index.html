@@ -30,10 +30,6 @@
         <p class="subtitle">
           Today is all about you. Thank you for being my favorite person, my safe place, and my best adventure. :D
         </p>
-        <div class="hero-actions">
-          <button id="celebrateBtn" class="celebrate-btn">Surprise</button>
-          <button id="cakeBtn" class="celebrate-btn cake-entry-btn">Have a cake</button>
-        </div>
       </section>
 
       <section class="cards">
@@ -42,7 +38,14 @@
             I hope this year brings you bold dreams, peaceful mornings, and so many reasons to laugh.
             And I hope I get to celebrate every win beside you.
           </p>
+          
         </article>
+      </section>
+
+      <section class="cake">
+        <div class="hero-actions">
+            <button id="cakeBtn" class="celebrate-btn cake-entry-btn">Have a cake</button>
+        </div>
       </section>
 
       <section class="wish-gif-wrap" aria-label="Birthday gif">
@@ -61,19 +64,16 @@
           <h2>1. Choose your flavor</h2>
           <div class="flavor-grid" role="radiogroup" aria-label="Cake flavors">
             <button class="flavor-option active" data-flavor="vanilla">Vanilla</button>
-            <button class="flavor-option" data-flavor="chocolate">Chocolate</button>
+            <button class="flavor-option" data-flavor="chocolate">Sesame</button>
             <button class="flavor-option" data-flavor="strawberry">Strawberry</button>
+            <button class="flavor-option" data-flavor="earlgrey">Earlgrey</button>
           </div>
           <button id="toStep2Btn" class="celebrate-btn next-btn">Next: Decorate</button>
         </article>
 
         <article class="card game-panel hidden" id="step2Panel">
           <h2>2. Decorate your cake</h2>
-          <div class="decorate-grid">
-            <label><input type="checkbox" class="deco-toggle" data-deco="sprinkles" checked /> Rainbow sprinkles</label>
-            <label><input type="checkbox" class="deco-toggle" data-deco="cherry" /> Cherry on top</label>
-            <label><input type="checkbox" class="deco-toggle" data-deco="drizzle" /> Chocolate drizzle</label>
-          </div>
+          <div class="decorate-grid" aria-live="polite"></div>
           <div class="step-actions">
             <button id="backToStep1Btn" class="secondary-btn">Back</button>
             <button id="toStep3Btn" class="celebrate-btn next-btn">Next: Light candle</button>
@@ -87,7 +87,7 @@
             <button id="backToStep2Btn" class="secondary-btn">Back</button>
             <button id="lightCandleBtn" class="celebrate-btn">Light candle</button>
           </div>
-          <p id="wishText" class="wish-text hidden">Happy Birthday! Your cake is ready.</p>
+          <p id="wishText" class="wish-text hidden">Happy Birthday, Hooray! :D</p>
         </article>
 
         <aside class="card cake-preview-wrap" aria-label="Cake preview">
@@ -95,7 +95,7 @@
             <div class="cake-top"></div>
             <div class="cake-middle"></div>
             <div class="cake-bottom"></div>
-            <div class="sprinkles" aria-hidden="true"></div>
+            <div class="sprinkles hidden" aria-hidden="true"></div>
             <div class="drizzle hidden" aria-hidden="true"></div>
             <div class="cherry hidden" aria-hidden="true"></div>
             <div class="candle" aria-hidden="true">

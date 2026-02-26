@@ -1,4 +1,3 @@
-const celebrateBtn = document.getElementById("celebrateBtn");
 const introOverlay = document.getElementById("introOverlay");
 
 function launchConfetti(count = 42) {
@@ -20,19 +19,9 @@ function launchConfetti(count = 42) {
 
 window.launchConfetti = launchConfetti;
 
-if (celebrateBtn) {
-  celebrateBtn.addEventListener("click", () => {
-    launchConfetti();
-    celebrateBtn.textContent = "Celebrating";
-    setTimeout(() => {
-      celebrateBtn.textContent = "Surprise";
-    }, 1500);
-  });
-}
-
 if (introOverlay) {
   const popDurationMs = 2500;
-  const fadeDurationMs = 2000;
+  const fadeDurationMs = 1000; // 2000
 
   window.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
