@@ -51,6 +51,10 @@
       <section class="wish-gif-wrap" aria-label="Birthday gif">
         <img class="wish-gif" src="src/rollingpiggy.gif" alt="Rolling pig birthday gif" />
       </section>
+
+      <section class="cards">
+        <p class="cake-preview-reminder">Created with ❤️ by Iris and CodeX</p>
+      </section>
     </main>
 
     <main id="cakeGame" class="page cake-game hidden" aria-live="polite">
@@ -68,15 +72,15 @@
             <button class="flavor-option" data-flavor="strawberry">Strawberry</button>
             <button class="flavor-option" data-flavor="earlgrey">Earlgrey</button>
           </div>
-          <button id="toStep2Btn" class="celebrate-btn next-btn">Next: Decorate</button>
+          <button id="toStep2Btn" class="celebrate-btn next-btn">Next</button>
         </article>
 
         <article class="card game-panel hidden" id="step2Panel">
           <h2>2. Decorate your cake</h2>
           <div class="decorate-grid" aria-live="polite"></div>
           <div class="step-actions">
-            <button id="backToStep1Btn" class="secondary-btn">Back</button>
-            <button id="toStep3Btn" class="celebrate-btn next-btn">Next: Light candle</button>
+            <button id="backToStep1Btn" class="secondary-btn back-btn">Back</button>
+            <button id="toStep3Btn" class="celebrate-btn next-btn">Next</button>
           </div>
         </article>
 
@@ -84,9 +88,9 @@
           <h2>3. Light candle</h2>
           <p>Make a wish and light the candle.</p>
           <div class="step-actions">
-            <button id="backToStep2Btn" class="secondary-btn">Back</button>
-            <button id="lightCandleBtn" class="celebrate-btn">Light candle</button>
-            <button id="takePictureBtn" class="celebrate-btn">Take a Picture</button>
+            <button id="backToStep2Btn" class="secondary-btn back-btn">Back</button>
+            <button id="lightCandleBtn" class="celebrate-btn next-btn">Light candle</button>
+            <button id="takePictureBtn" class="celebrate-btn next-btn">Take a Picture</button>
           </div>
           <p id="wishText" class="wish-text hidden">Happy Birthday, Hooray! :D</p>
         </article>
@@ -96,16 +100,24 @@
             <div class="cake-top"></div>
             <div class="cake-middle"></div>
             <div class="cake-bottom"></div>
-            <div class="sprinkles hidden" aria-hidden="true"></div>
-            <div class="drizzle hidden" aria-hidden="true"></div>
-            <div class="cherry hidden" aria-hidden="true"></div>
             <div class="candle" aria-hidden="true">
               <span id="flame" class="flame hidden"></span>
             </div>
           </div>
+          <p class="cake-preview-reminder">Double click to remove decoration.</p>
         </aside>
       </section>
     </main>
+
+    <div id="pictureModal" class="picture-modal hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Cake snapshot preview">
+      <div class="picture-modal-card">
+        <img id="picturePreviewImg" class="picture-preview-img" alt="Cake snapshot preview" />
+        <div class="picture-modal-actions">
+          <p class="wish-text">Be happy, be brave, and be yourself 🌞</p>
+          <button id="closePicturePreviewBtn" class="secondary-btn">Close</button>
+        </div>
+      </div>
+    </div>
 
     <script src="script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>

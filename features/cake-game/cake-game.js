@@ -18,6 +18,9 @@
   const backToStep2Btn = document.getElementById("backToStep2Btn");
   const lightCandleBtn = document.getElementById("lightCandleBtn");
   const takePictureBtn = document.getElementById("takePictureBtn");
+  const pictureModal = document.getElementById("pictureModal");
+  const picturePreviewImg = document.getElementById("picturePreviewImg");
+  const closePicturePreviewBtn = document.getElementById("closePicturePreviewBtn");
 
   const flavorOptions = [...document.querySelectorAll(".flavor-option")];
   const decorateGrid = step2Panel?.querySelector(".decorate-grid");
@@ -37,6 +40,9 @@
     !backToStep2Btn ||
     !lightCandleBtn ||
     !takePictureBtn ||
+    !pictureModal ||
+    !picturePreviewImg ||
+    !closePicturePreviewBtn ||
     !cakePreview ||
     !flame ||
     !wishText ||
@@ -49,6 +55,8 @@
     { id: "cherry", emoji: "\u{1F352}" },
     { id: "choco", emoji: "\u{1F36B}" },
     { id: "cookies", emoji: "\u{1F36A}" },
+    { id: "strawberry", emoji: "\u{1F353}" },
+    { id: "sprinkles", emoji: "\u{1F36C}" },
     // Extendable: add more items with { id, emoji }.
   ];
 
@@ -56,6 +64,8 @@
   let selectedFlavor = "vanilla";
   const stickerElementsByDeco = new Map(decorations.map((deco) => [deco.id, []]));
   let dragLayer = 10;
+  let latestSnapshotUrl = "";
+  let latestSnapshotName = "";
 
   const decoScrollMenu = document.createElement("div");
   decoScrollMenu.className = "deco-scroll-menu";
@@ -90,6 +100,36 @@
     }
   }
 
+  function buildSnapshotName() {
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    return `cake-snapshot-${stamp}.png`;
+  }
+
+  function downloadSnapshot(dataUrl, fileName) {
+    if (!dataUrl) {
+      return;
+    }
+    const link = document.createElement("a");
+    link.download = fileName || "cake-snapshot.png";
+    link.href = dataUrl;
+    link.click();
+  }
+
+  function closePicturePreview() {
+    pictureModal.classList.remove("open");
+    pictureModal.classList.add("hidden");
+    pictureModal.setAttribute("aria-hidden", "true");
+  }
+
+  function openPicturePreview(dataUrl) {
+    picturePreviewImg.src = dataUrl;
+    pictureModal.classList.remove("hidden");
+    pictureModal.setAttribute("aria-hidden", "false");
+    requestAnimationFrame(() => {
+      pictureModal.classList.add("open");
+    });
+  }
+
   async function downloadCakeSnapshot() {
     if (typeof window.html2canvas !== "function") {
       takePictureBtn.textContent = "Snapshot unavailable";
@@ -109,11 +149,10 @@
         scale: 2,
       });
 
-      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const link = document.createElement("a");
-      link.download = `cake-snapshot-${stamp}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
+      latestSnapshotUrl = canvas.toDataURL("image/png");
+      latestSnapshotName = buildSnapshotName();
+      openPicturePreview(latestSnapshotUrl);
+      downloadSnapshot(latestSnapshotUrl, latestSnapshotName);
     } catch (error) {
       takePictureBtn.textContent = "Try again";
     } finally {
@@ -304,6 +343,18 @@
   });
 
   takePictureBtn.addEventListener("click", downloadCakeSnapshot);
+  closePicturePreviewBtn.addEventListener("click", closePicturePreview);
+
+  pictureModal.addEventListener("click", (event) => {
+    if (event.target === pictureModal) {
+      closePicturePreview();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !pictureModal.classList.contains("hidden")) {
+      closePicturePreview();
+    }
+  });
 
   renderFlavor();
   renderDecorations();
