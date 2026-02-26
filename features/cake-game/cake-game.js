@@ -56,7 +56,7 @@
     { id: "choco", emoji: "\u{1F36B}" },
     { id: "cookies", emoji: "\u{1F36A}" },
     { id: "strawberry", emoji: "\u{1F353}" },
-    { id: "sprinkles", emoji: "\u{1F36C}" },
+    { id: "candy", emoji: "\u{1F36C}" },
     // Extendable: add more items with { id, emoji }.
   ];
 
