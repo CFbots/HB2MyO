@@ -21,7 +21,7 @@ window.launchConfetti = launchConfetti;
 
 if (introOverlay) {
   const popDurationMs = 2500;
-  const fadeDurationMs = 1000; // 2000
+  const fadeDurationMs = 2000;
 
   window.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {

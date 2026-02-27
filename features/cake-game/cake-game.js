@@ -66,9 +66,18 @@
   let selectedFlavor = "ube";
   const stickerElementsByDeco = new Map(decorations.map((deco) => [deco.id, []]));
   let dragLayer = 10;
-  let latestSnapshotUrl = "";
-  let latestSnapshotName = "";
-  const pictureStickerSrc = new URL("src/nh_sticker.png", document.baseURI).href;
+  const snapshotController =
+    typeof window.createCakeSnapshotController === "function"
+      ? window.createCakeSnapshotController({
+          cakePreview,
+          takePictureBtn,
+          pictureModal,
+          picturePreviewImg,
+          closePicturePreviewBtn,
+          pictureStickerSrc: "src/nh_sticker.png",
+          downloadOnCapture: true,
+        })
+      : null;
 
   const decoScrollMenu = document.createElement("div");
   decoScrollMenu.className = "deco-scroll-menu";
@@ -100,108 +109,6 @@
   function triggerConfetti(count = 42) {
     if (typeof window.launchConfetti === "function") {
       window.launchConfetti(count);
-    }
-  }
-
-  function buildSnapshotName() {
-    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-    return `cake-snapshot-${stamp}.png`;
-  }
-
-  function downloadSnapshot(dataUrl, fileName) {
-    if (!dataUrl) {
-      return;
-    }
-    const link = document.createElement("a");
-    link.download = fileName || "cake-snapshot.png";
-    link.href = dataUrl;
-    link.click();
-  }
-
-  function waitForImageLoad(image) {
-    if (image.complete && image.naturalWidth > 0) {
-      return Promise.resolve();
-    }
-
-    return new Promise((resolve, reject) => {
-      const onLoad = () => {
-        cleanup();
-        resolve();
-      };
-      const onError = () => {
-        cleanup();
-        reject(new Error("Sticker image failed to load"));
-      };
-      const cleanup = () => {
-        image.removeEventListener("load", onLoad);
-        image.removeEventListener("error", onError);
-      };
-
-      image.addEventListener("load", onLoad);
-      image.addEventListener("error", onError);
-    });
-  }
-
-  function addCaptureStickerElement() {
-    const sticker = document.createElement("img");
-    sticker.className = "snapshot-capture-sticker";
-    sticker.src = pictureStickerSrc;
-    sticker.alt = "";
-    sticker.setAttribute("aria-hidden", "true");
-    cakePreview.appendChild(sticker);
-    return sticker;
-  }
-
-  function closePicturePreview() {
-    pictureModal.classList.remove("open");
-    pictureModal.classList.add("hidden");
-    pictureModal.setAttribute("aria-hidden", "true");
-  }
-
-  function openPicturePreview(dataUrl) {
-    picturePreviewImg.src = dataUrl;
-    pictureModal.classList.remove("hidden");
-    pictureModal.setAttribute("aria-hidden", "false");
-    requestAnimationFrame(() => {
-      pictureModal.classList.add("open");
-    });
-  }
-
-  async function downloadCakeSnapshot() {
-    if (typeof window.html2canvas !== "function") {
-      takePictureBtn.textContent = "Snapshot unavailable";
-      setTimeout(() => {
-        takePictureBtn.textContent = "Take a Picture";
-      }, 1200);
-      return;
-    }
-
-    const previousLabel = takePictureBtn.textContent;
-    takePictureBtn.disabled = true;
-    takePictureBtn.textContent = "Taking...";
-    let captureStickerElement = null;
-
-    try {
-      captureStickerElement = addCaptureStickerElement();
-      await waitForImageLoad(captureStickerElement);
-
-      const canvas = await window.html2canvas(cakePreview, {
-        backgroundColor: null,
-        scale: 2,
-      });
-
-      latestSnapshotUrl = canvas.toDataURL("image/png");
-      latestSnapshotName = buildSnapshotName();
-      openPicturePreview(latestSnapshotUrl);
-      downloadSnapshot(latestSnapshotUrl, latestSnapshotName);
-    } catch (error) {
-      takePictureBtn.textContent = "Try again";
-    } finally {
-      captureStickerElement?.remove();
-      setTimeout(() => {
-        takePictureBtn.disabled = false;
-        takePictureBtn.textContent = previousLabel;
-      }, 600);
     }
   }
 
@@ -384,18 +291,15 @@
     triggerConfetti(64);
   });
 
-  takePictureBtn.addEventListener("click", downloadCakeSnapshot);
-  closePicturePreviewBtn.addEventListener("click", closePicturePreview);
-
-  pictureModal.addEventListener("click", (event) => {
-    if (event.target === pictureModal) {
-      closePicturePreview();
+  takePictureBtn.addEventListener("click", () => {
+    if (snapshotController) {
+      snapshotController.takeSnapshot();
+      return;
     }
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !pictureModal.classList.contains("hidden")) {
-      closePicturePreview();
-    }
+    takePictureBtn.textContent = "Snapshot unavailable";
+    setTimeout(() => {
+      takePictureBtn.textContent = "Take a Picture";
+    }, 1200);
   });
 
   renderFlavor();
