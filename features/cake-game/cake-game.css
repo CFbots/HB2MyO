@@ -231,6 +231,16 @@
   height: 260px;
 }
 
+.snapshot-capture-sticker {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 74px;
+  height: auto;
+  z-index: 70;
+  pointer-events: none;
+}
+
 .cake-top,
 .cake-middle,
 .cake-bottom {
@@ -259,10 +269,10 @@
   top: 156px;
 }
 
-.flavor-vanilla .cake-top,
-.flavor-vanilla .cake-middle,
-.flavor-vanilla .cake-bottom {
-  background: linear-gradient(180deg, #fff6d9, #f8dfa8);
+.flavor-ube .cake-top,
+.flavor-ube .cake-middle,
+.flavor-ube .cake-bottom {
+  background: linear-gradient(180deg, #e8d3f8, #af9fbb);
 }
 
 .flavor-chocolate .cake-top,
@@ -271,16 +281,16 @@
   background: linear-gradient(180deg, #74716e, #585553);
 }
 
-.flavor-strawberry .cake-top,
-.flavor-strawberry .cake-middle,
-.flavor-strawberry .cake-bottom {
-  background: linear-gradient(180deg, #ffb0c9, #f780a7);
+.flavor-matcha .cake-top,
+.flavor-matcha .cake-middle,
+.flavor-matcha .cake-bottom {
+  background: linear-gradient(180deg, #a7c98f, #7aa86c);
 }
 
 .flavor-earlgrey .cake-top,
 .flavor-earlgrey .cake-middle,
 .flavor-earlgrey .cake-bottom {
-  background: linear-gradient(180deg, #ffc497, #cc9c77);
+  background: linear-gradient(180deg, #ffdfc6, #d8bea9);
 }
 
 .sprinkles {

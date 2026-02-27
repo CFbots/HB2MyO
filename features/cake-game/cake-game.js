@@ -53,19 +53,22 @@
 
   const decorations = [
     { id: "cherry", emoji: "\u{1F352}" },
-    { id: "choco", emoji: "\u{1F36B}" },
+    { id: "redbean", emoji: "\u{1FAD8}" },
     { id: "cookies", emoji: "\u{1F36A}" },
     { id: "strawberry", emoji: "\u{1F353}" },
-    { id: "candy", emoji: "\u{1F36C}" },
+    { id: "blueberry", emoji: "\u{1FAD0}" },
+    { id: "mint", emoji: "\u{1F33F}" },
+    { id: "dango", emoji: "\u{1F361}" },
     // Extendable: add more items with { id, emoji }.
   ];
 
   let gameStep = 1;
-  let selectedFlavor = "vanilla";
+  let selectedFlavor = "ube";
   const stickerElementsByDeco = new Map(decorations.map((deco) => [deco.id, []]));
   let dragLayer = 10;
   let latestSnapshotUrl = "";
   let latestSnapshotName = "";
+  const pictureStickerSrc = new URL("src/nh_sticker.png", document.baseURI).href;
 
   const decoScrollMenu = document.createElement("div");
   decoScrollMenu.className = "deco-scroll-menu";
@@ -115,6 +118,40 @@
     link.click();
   }
 
+  function waitForImageLoad(image) {
+    if (image.complete && image.naturalWidth > 0) {
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+      const onLoad = () => {
+        cleanup();
+        resolve();
+      };
+      const onError = () => {
+        cleanup();
+        reject(new Error("Sticker image failed to load"));
+      };
+      const cleanup = () => {
+        image.removeEventListener("load", onLoad);
+        image.removeEventListener("error", onError);
+      };
+
+      image.addEventListener("load", onLoad);
+      image.addEventListener("error", onError);
+    });
+  }
+
+  function addCaptureStickerElement() {
+    const sticker = document.createElement("img");
+    sticker.className = "snapshot-capture-sticker";
+    sticker.src = pictureStickerSrc;
+    sticker.alt = "";
+    sticker.setAttribute("aria-hidden", "true");
+    cakePreview.appendChild(sticker);
+    return sticker;
+  }
+
   function closePicturePreview() {
     pictureModal.classList.remove("open");
     pictureModal.classList.add("hidden");
@@ -142,8 +179,12 @@
     const previousLabel = takePictureBtn.textContent;
     takePictureBtn.disabled = true;
     takePictureBtn.textContent = "Taking...";
+    let captureStickerElement = null;
 
     try {
+      captureStickerElement = addCaptureStickerElement();
+      await waitForImageLoad(captureStickerElement);
+
       const canvas = await window.html2canvas(cakePreview, {
         backgroundColor: null,
         scale: 2,
@@ -156,6 +197,7 @@
     } catch (error) {
       takePictureBtn.textContent = "Try again";
     } finally {
+      captureStickerElement?.remove();
       setTimeout(() => {
         takePictureBtn.disabled = false;
         takePictureBtn.textContent = previousLabel;
@@ -173,7 +215,7 @@
   }
 
   function renderFlavor() {
-    cakePreview.classList.remove("flavor-vanilla", "flavor-chocolate", "flavor-strawberry", "flavor-earlgrey");
+    cakePreview.classList.remove("flavor-ube", "flavor-chocolate", "flavor-matcha", "flavor-earlgrey");
     cakePreview.classList.add(`flavor-${selectedFlavor}`);
   }
 
@@ -278,9 +320,9 @@
   }
 
   function resetGame() {
-    selectedFlavor = "vanilla";
+    selectedFlavor = "ube";
     flavorOptions.forEach((opt) => {
-      opt.classList.toggle("active", opt.dataset.flavor === "vanilla");
+      opt.classList.toggle("active", opt.dataset.flavor === "ube");
     });
 
     stickerElementsByDeco.forEach((stickers) => {
